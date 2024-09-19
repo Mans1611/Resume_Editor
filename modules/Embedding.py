@@ -4,8 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-vocab_size = 30522        ## default for BERT model
-max_length = 768  
+vocab_size = 30522        ## default for BERT model which is the unique words that the model train on.
+max_length = 768          ## the max words that the string can contain.  
 model_name = 'bert-base-uncased'
 
 config = BertConfig.from_pretrained(model_name)  
@@ -22,8 +22,8 @@ class Embedding:
     '''
         This Class is using the Bert Model to encode the text into embedding of dimnsion of (n,768,768)
         where: 
-            n -> is the batch size e.g (number of text, or number of resumes), in our case it will be 1 in most case.
-            dim = 1 ,768 -> the max length of the string (number of tokens), default from bert is almost 30566, wich is the default unique words the the model train on.
+            dim = 0 n -> is the batch size e.g (number of text, or number of resumes), in our case it will be 1 in most case.
+            dim = 1 ,30522 -> the max length of the string (number of tokens), default from bert is almost 30566, wich is the default unique words the the model train on.
             dim = 2 ,768 -> each token representation into embedding for example word: building ->is represented by 768 embedding vector, which is the dim=2.
     '''
     def __init__(self):
@@ -39,7 +39,7 @@ class Embedding:
             return:
                 tensor(torch.Tensor):(n,768,768)
         '''
-        tokens = self.tokenizer(text,return_tensors='pt',padding='max_length',max_length=max_length)
+        tokens = self.tokenizer(text,return_tensors='pt',padding='max_length',max_length=768,truncation=True)
         
         with torch.no_grad():   ## stopping the gradient, I just want to get embedding, without adjusting the weights
             output = self.bert_model(**tokens)
